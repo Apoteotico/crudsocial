@@ -79,6 +79,7 @@ cross-env: Herramienta que permite establecer variables de entorno de manera ind
 dotenv: Módulo que facilita la carga de variables de entorno desde un archivo .env en aplicaciones Node.js, útil para configurar variables de entorno en entornos de desarrollo.
 
 quedaria algo así en el package.json:
+```json
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
@@ -97,7 +98,7 @@ quedaria algo así en el package.json:
     "dotenv": "^16.3.1",
     "nodemon": "^3.0.1"
   }
-
+```
 ---------
 ## resumen de los pasos a seguir para terminar el proyecto:
 
