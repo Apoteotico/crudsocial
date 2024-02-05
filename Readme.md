@@ -128,6 +128,7 @@ creación conexión a la base de datos de mongodb con express.
 - index.js
 - db.js
 - config.js
+- .env
 
 ## app:
 ```js
@@ -136,6 +137,20 @@ import express from "express";
 const app = express();
 app.use(express.json());
 
+export default app;
+```
+Con explicación linea por linea
+```js
+// Importa el módulo 'express' para crear una aplicación Express
+import express from "express";
+
+// Crea una nueva instancia de la aplicación Express
+const app = express();
+
+// Configura la aplicación Express para que pueda analizar el cuerpo de las solicitudes en formato JSON
+app.use(express.json());
+
+// Exporta la aplicación Express para que pueda ser utilizada en otros archivos
 export default app;
 ```
 
@@ -155,6 +170,26 @@ app.listen(port, () => {
   console.log('Server on port', port);
 });
 ```
+Con explicación linea por linea
+```js
+// Importa la aplicación Express creada en app.js
+import app from "./app.js";
+
+// Importa la función connectDB y la configuración del puerto desde otros archivos
+import { connectDB } from '../src/database/db.js'
+import { settingDotEnvPort } from "./config/config.js";
+
+// Llama a la función connectDB para conectar a la base de datos
+connectDB();
+
+// Obtiene el puerto de la configuración
+const { port } = settingDotEnvPort();
+
+// Inicia el servidor Express y muestra un mensaje en la consola cuando esté escuchando en el puerto especificado
+app.listen(port, () => {
+  console.log('Server on port', port);
+});
+```
 
 ## db:
 ```js
@@ -167,6 +202,31 @@ export const connectDB = async () => {
     await mongoose.connect(db.localhost);
     console.log(">>> DB is connected")
   } catch (error) {
+    console.log(error);
+  }
+};
+```
+Con explicación linea por linea
+```js
+// Importa la biblioteca 'mongoose' para interactuar con la base de datos MongoDB
+import mongoose from "mongoose";
+
+// Importa la función de configuración de la base de datos desde otro archivo
+import { settingDotEnvDb } from "../config/config.js";
+
+// Define la función para conectar a la base de datos
+export const connectDB = async () => {
+  try {
+    // Obtiene la URL de la base de datos desde la configuración
+    const { db } = settingDotEnvDb();
+    
+    // Conecta a la base de datos utilizando la URL proporcionada
+    await mongoose.connect(db.localhost);
+    
+    // Muestra un mensaje en la consola indicando que la base de datos está conectada
+    console.log(">>> DB is connected")
+  } catch (error) {
+    // Captura cualquier error y lo muestra en la consola
     console.log(error);
   }
 };
@@ -190,4 +250,49 @@ export const settingDotEnvDb = () => {
     },
   };
 };
+```
+Con explicación linea por linea
+```js
+// Importa la biblioteca 'dotenv' para cargar variables de entorno desde un archivo .env
+import dotenv from "dotenv"; 
+
+// Carga las variables de entorno desde el archivo .env
+dotenv.config();
+
+// Define una función para obtener la configuración del puerto desde las variables de entorno
+export const settingDotEnvPort = () => {
+  return { port: process.env.PORT };
+};
+
+// Define una función para obtener la configuración de la base de datos desde las variables de entorno
+export const settingDotEnvDb = () => {
+  return {
+    db: {
+      host: process.env.DB_HOST, localhost: process.env.DB_LOCALHOST,
+    },
+  };
+};
+```
+
+## .env estructura basica:
+```js
+PORT=numero del puerto ejemplo 8080 9090 3000 4000 6000
+
+FRONTEND_URL=http://localhost:5173
+
+DB_LOCALHOST="mongodb://127.0.0.1:27017/nombredeladb"
+
+SECRET=secretpassword      
+
+TOKEN_SECRET=secretpassword2 
+
+
+PORT: Este es el puerto en el que se ejecutará tu servidor Express. El valor 4000 es comúnmente utilizado para aplicaciones web locales, pero puedes cambiarlo si es necesario.
+
+FRONTEND_URL: Esta variable puede ser útil si tu aplicación backend necesita comunicarse con un frontend. Aquí has configurado una URL de frontend local en el puerto 5173. Asegúrate de que esta URL coincida con la ubicación de tu frontend si es relevante para tu proyecto.
+
+DB_LOCALHOST: Esta variable define la URL de conexión a tu base de datos MongoDB local. La URL mongodb://127.0.0.1:27017/
+crudredsocial indica que la base de datos se encuentra en localhost en el puerto 27017 y se llama "crudredsocial". Asegúrate de que esta URL coincida con la configuración de tu base de datos local.
+
+SECRET y TOKEN_SECRET: Estas son cadenas de texto utilizadas para firmar y verificar tokens JWT en tu aplicación. Asegúrate de que estas cadenas sean lo suficientemente seguras y únicas para proteger tus tokens.
 ```
